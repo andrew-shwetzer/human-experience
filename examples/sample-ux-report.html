@@ -3,520 +3,1153 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UX Simulation Report — Skyvern (svlp-v2.replit.app)</title>
+<title>Talent Signals UX Simulation Report</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
   :root {
-    --bg:#0a0a0f;--surface:#12121a;--surface-2:#1a1a26;--border:rgba(255,255,255,0.06);--border-bright:rgba(255,255,255,0.12);
-    --text:#e8e8ed;--text-dim:#8888a0;--text-muted:#555566;--amber:#f0b429;--amber-dim:rgba(240,180,41,0.15);
-    --red:#ef4444;--red-dim:rgba(239,68,68,0.12);--green:#22c55e;--green-dim:rgba(34,197,94,0.12);
-    --blue:#3b82f6;--blue-dim:rgba(59,130,246,0.12);--orange:#f97316;--orange-dim:rgba(249,115,22,0.12);
+    --bg: #0a0f1a;
+    --surface: rgba(255,255,255,0.03);
+    --surface-2: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.08);
+    --border-accent: rgba(6,182,212,0.2);
+    --text: #e2e8f0;
+    --text-muted: #64748b;
+    --accent: #06b6d4;
+    --accent-dim: rgba(6,182,212,0.1);
+    --accent-glow: rgba(6,182,212,0.06);
+    --red: #ef4444;
+    --red-dim: rgba(239,68,68,0.1);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245,158,11,0.1);
+    --blue: #3b82f6;
+    --blue-dim: rgba(59,130,246,0.1);
+    --slate: #64748b;
+    --slate-dim: rgba(100,116,139,0.1);
+    --green: #22c55e;
+    --green-dim: rgba(34,197,94,0.1);
   }
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--text);font-family:'Inter',-apple-system,sans-serif;line-height:1.6;}
-  .report-header{background:linear-gradient(135deg,var(--surface),var(--bg));border-bottom:1px solid var(--border);padding:48px 40px;text-align:center;}
-  .report-header h1{font-size:2rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;}
-  .report-header .subtitle{color:var(--text-dim);font-size:0.95rem;}
-  .report-header .meta{display:flex;justify-content:center;gap:32px;margin-top:20px;font-size:0.85rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
-  .report-header .meta span{color:var(--amber);}
-  .container{max-width:1100px;margin:0 auto;padding:40px 32px;}
-  section{margin-bottom:48px;}
-  h2{font-size:1.4rem;font-weight:600;color:var(--amber);margin-bottom:20px;padding-bottom:8px;border-bottom:1px solid var(--border);}
-  h3{font-size:1.1rem;font-weight:600;margin-bottom:12px;color:var(--text);}
-  p{margin-bottom:12px;color:var(--text-dim);}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:16px;}
-  .card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;}
-  .screenshot-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px;margin:16px 0;}
-  .screenshot-container{background:var(--surface-2);border:1px solid var(--border);border-radius:10px;overflow:hidden;}
-  .screenshot-container img{width:100%;display:block;}
-  .screenshot-container .caption{padding:10px 14px;font-size:0.8rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;border-top:1px solid var(--border);}
-  .badge{display:inline-block;padding:3px 10px;border-radius:6px;font-size:0.75rem;font-weight:600;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:0.5px;}
-  .badge-blocker{background:var(--red-dim);color:var(--red);}
-  .badge-high{background:var(--orange-dim);color:var(--orange);}
-  .badge-medium{background:var(--amber-dim);color:var(--amber);}
-  .badge-low{background:var(--blue-dim);color:var(--blue);}
-  .badge-hook{background:var(--green-dim);color:var(--green);}
-  .badge-neutral{background:var(--amber-dim);color:var(--amber);}
-  .verdict-badge{font-size:1.1rem;padding:6px 16px;}
-  .step-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:12px;border-left:3px solid var(--border-bright);}
-  .step-card.friction-high{border-left-color:var(--orange);}
-  .step-card.friction-medium{border-left-color:var(--amber);}
-  .step-card.friction-low{border-left-color:var(--blue);}
-  .step-card.friction-blocker{border-left-color:var(--red);}
-  .step-card.friction-none{border-left-color:var(--green);}
-  .step-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
-  .step-header h4{font-weight:600;font-size:0.95rem;}
-  .step-detail{display:grid;grid-template-columns:100px 1fr;gap:4px 12px;font-size:0.88rem;line-height:1.5;}
-  .step-detail dt{color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:0.78rem;text-transform:uppercase;}
-  .step-detail dd{color:var(--text-dim);margin-bottom:6px;}
-  .scorecard{font-family:'JetBrains Mono',monospace;width:100%;border-collapse:collapse;font-size:0.9rem;}
-  .scorecard th,.scorecard td{padding:12px 16px;text-align:left;border-bottom:1px solid var(--border);}
-  .scorecard th{color:var(--text-muted);font-weight:500;font-size:0.78rem;text-transform:uppercase;letter-spacing:0.5px;}
-  .scorecard td:last-child{text-align:center;}
-  .score{font-weight:700;font-size:1.1rem;}
-  .score-1,.score-2{color:var(--red);}
-  .score-3{color:var(--amber);}
-  .score-4{color:var(--green);}
-  .score-5{color:var(--green);text-shadow:0 0 8px rgba(34,197,94,0.3);}
-  .composite-row td{padding-top:16px;font-weight:700;font-size:1.05rem;color:var(--amber);border-top:2px solid var(--border-bright);}
-  .emotional-arc{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0;}
-  .emotion-chip{background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 14px;font-size:0.82rem;display:flex;align-items:center;gap:8px;}
-  .emotion-chip .conf{color:var(--text-muted);font-family:'JetBrains Mono',monospace;font-size:0.72rem;}
-  .fix-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:20px 24px;margin-bottom:12px;position:relative;border-left:3px solid var(--amber);}
-  .fix-card .fix-num{position:absolute;top:16px;right:16px;background:var(--amber-dim);color:var(--amber);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.85rem;font-family:'JetBrains Mono',monospace;}
-  .fix-meta{display:flex;gap:12px;margin-top:10px;flex-wrap:wrap;}
-  .fix-meta .tag{background:var(--surface-2);border:1px solid var(--border);padding:3px 10px;border-radius:6px;font-size:0.75rem;color:var(--text-muted);font-family:'JetBrains Mono',monospace;}
-  .summary-stat{text-align:center;padding:16px;}
-  .summary-stat .number{font-size:2rem;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--amber);}
-  .summary-stat .label{font-size:0.8rem;color:var(--text-muted);margin-top:4px;}
-  .footer{text-align:center;padding:32px;color:var(--text-muted);font-size:0.78rem;border-top:1px solid var(--border);}
-  @media(max-width:900px){.screenshot-grid,.card-grid{grid-template-columns:1fr;}}
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 56px 24px;
+  }
+
+  /* Header */
+  .report-header {
+    text-align: center;
+    padding-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 56px;
+  }
+
+  .report-header .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 5px 14px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+
+  .report-header h1 {
+    font-size: 2.2rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    margin-bottom: 8px;
+  }
+
+  .report-header .subtitle {
+    color: var(--text-muted);
+    font-size: 0.92rem;
+  }
+
+  .report-header .meta {
+    margin-top: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+
+  /* Sections */
+  section {
+    margin-bottom: 56px;
+  }
+
+  h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-bottom: 24px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+  }
+
+  h2 .step-num {
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    margin-right: 8px;
+  }
+
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--accent);
+  }
+
+  p { margin-bottom: 12px; font-size: 0.92rem; }
+
+  /* Cards */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .card-blocker { border-left: 3px solid var(--red); }
+  .card-high { border-left: 3px solid var(--amber); }
+  .card-medium { border-left: 3px solid var(--blue); }
+  .card-low { border-left: 3px solid var(--slate); }
+  .card-positive { border-left: 3px solid var(--green); }
+
+  /* Badges */
+  .badge {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 3px;
+    vertical-align: middle;
+  }
+
+  .badge-blocker { background: var(--red-dim); color: var(--red); }
+  .badge-high { background: var(--amber-dim); color: var(--amber); }
+  .badge-medium { background: var(--blue-dim); color: var(--blue); }
+  .badge-low { background: var(--slate-dim); color: var(--slate); }
+  .badge-hook { background: var(--green-dim); color: var(--green); }
+
+  /* Score card */
+  .scorecard {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .scorecard-grid {
+    display: grid;
+    grid-template-columns: 1fr 60px;
+    gap: 6px 16px;
+    align-items: center;
+  }
+
+  .scorecard-grid .dim-name {
+    font-size: 0.88rem;
+  }
+
+  .scorecard-grid .dim-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.05rem;
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .score-1, .score-2 { color: var(--red); }
+  .score-3 { color: var(--amber); }
+  .score-4 { color: var(--green); }
+  .score-5 { color: var(--accent); }
+
+  .composite {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .composite .label {
+    font-size: 0.88rem;
+    font-weight: 600;
+  }
+
+  .composite .score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--amber);
+  }
+
+  /* Executive summary score */
+  .exec-score {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+
+  .exec-score .number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 3rem;
+    font-weight: 700;
+    color: var(--amber);
+    line-height: 1;
+  }
+
+  .exec-score .of {
+    font-size: 1.4rem;
+    color: var(--text-muted);
+  }
+
+  .exec-score .label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Screenshot */
+  .screenshot {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin: 16px 0;
+    background: #000;
+  }
+
+  .screenshot img {
+    width: 100%;
+    display: block;
+  }
+
+  .screenshot-caption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    padding: 8px 12px;
+    background: rgba(0,0,0,0.4);
+  }
+
+  /* Screenshot grid */
+  .screenshot-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .screenshot-grid-3 {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  /* Walk step */
+  .walk-step {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 20px;
+    position: relative;
+  }
+
+  .walk-step .step-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .walk-step .step-number {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--accent);
+    background: var(--accent-dim);
+    padding: 4px 10px;
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+
+  .walk-step .step-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .walk-step .walk-row {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    gap: 4px 12px;
+    margin-bottom: 6px;
+    font-size: 0.88rem;
+  }
+
+  .walk-step .walk-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding-top: 2px;
+  }
+
+  .walk-step .walk-value {
+    color: var(--text);
+  }
+
+  /* Emotional arc */
+  .arc-bar {
+    display: flex;
+    align-items: end;
+    gap: 8px;
+    height: 140px;
+    padding: 0 4px;
+    margin: 20px 0;
+  }
+
+  .arc-col {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .arc-fill {
+    width: 100%;
+    border-radius: 4px 4px 0 0;
+    min-height: 8px;
+    transition: height 0.3s;
+  }
+
+  .arc-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.6rem;
+    color: var(--text-muted);
+    text-align: center;
+  }
+
+  .arc-score {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+  }
+
+  /* Fix list */
+  .fix-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 24px;
+    margin-bottom: 16px;
+  }
+
+  .fix-item .fix-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .fix-item .fix-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--bg);
+    background: var(--accent);
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+  }
+
+  .fix-item .fix-title {
+    font-weight: 600;
+    font-size: 0.95rem;
+    flex: 1;
+  }
+
+  .fix-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .fix-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Viewport comparison */
+  .viewport-grid {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .viewport-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .viewport-card .viewport-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    padding: 8px 12px;
+    background: var(--accent-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .viewport-card img {
+    width: 100%;
+    display: block;
+  }
+
+  /* Verdict grid */
+  .verdict-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin: 16px 0;
+  }
+
+  .verdict-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+  }
+
+  .verdict-item .verdict-q {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  .verdict-item .verdict-a {
+    font-size: 0.88rem;
+    font-weight: 500;
+  }
+
+  .verdict-a.negative { color: var(--red); }
+  .verdict-a.caution { color: var(--amber); }
+  .verdict-a.positive { color: var(--green); }
+  .verdict-a.neutral { color: var(--text); }
+
+  /* Divider */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 48px 0;
+  }
+
+  /* Utility */
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .muted { color: var(--text-muted); }
+  .small { font-size: 0.82rem; }
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .mb-8 { margin-bottom: 8px; }
+
+  /* Print */
+  @media print {
+    body { background: #fff; color: #1a1a1a; }
+    .card, .scorecard, .walk-step, .fix-item, .verdict-item, .viewport-card {
+      border-color: #ddd;
+      background: #f9f9f9;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .screenshot-grid { grid-template-columns: 1fr; }
+    .screenshot-grid-3 { grid-template-columns: 1fr; }
+    .viewport-grid { grid-template-columns: 1fr; }
+    .verdict-grid { grid-template-columns: 1fr; }
+    .exec-score .number { font-size: 2.2rem; }
+  }
 </style>
 </head>
 <body>
 
-<div class="report-header">
-  <h1>UX Simulation Report</h1>
-  <div class="subtitle">Skyvern — svlp-v2.replit.app (V2 Landing Page)</div>
-  <div class="meta">
-    <div>DATE <span>2026-03-10</span></div>
-    <div>CONFIDENCE <span>HIGH</span></div>
-    <div>CAPTURES <span>42 + 14 funnel</span></div>
-    <div>VERDICT <span>HOOK</span></div>
-  </div>
-</div>
-
 <div class="container">
 
-<!-- EXECUTIVE SUMMARY -->
-<section>
-  <h2>Executive Summary</h2>
-  <div class="card">
-    <p style="color:var(--text);font-size:1rem;line-height:1.7;">
-      Skyvern's V2 landing page is a well-executed developer tool marketing page. The hero immediately communicates what Skyvern does ("AI agents to automate workflows on any website"), backs it with trust signals (HIPAA, SOC2, Y Combinator, 20.7K GitHub stars), and offers a clear primary CTA ("Start Building"). The page follows a strong information architecture: problem statement, use cases, build methods, developer integration, competitive comparison, security, and final CTA. The design is clean and professional with a warm cream palette and Plus Jakarta Sans typography. The major issue: the full-page screenshot reveals enormous blank sections where animations/lazy-loaded content failed to render, meaning ~60% of the page appears empty to crawlers and possibly to users on slow connections.
-    </p>
-  </div>
-  <div class="card-grid">
-    <div class="card"><div class="summary-stat"><div class="number">27/35</div><div class="label">Composite Score</div></div></div>
-    <div class="card"><div class="summary-stat"><div class="number">1.3s</div><div class="label">Load Time (all viewports)</div></div></div>
-    <div class="card"><div class="summary-stat"><div class="number">20.7K</div><div class="label">GitHub Stars (trust signal)</div></div></div>
-    <div class="card"><div class="summary-stat"><div class="number">50</div><div class="label">Interactive Elements</div></div></div>
-  </div>
-</section>
+  <!-- HEADER -->
+  <header class="report-header">
+    <div class="tag">UX Simulation Report</div>
+    <h1>Talent Signals</h1>
+    <p class="subtitle">Human experience audit of talentsignals.co marketing site</p>
+    <div class="meta">
+      <span>Date: 2026-03-09</span>
+      <span>Method: 7-step cognitive walkthrough</span>
+      <span>Viewports: 3 (desktop, tablet, mobile)</span>
+    </div>
+  </header>
 
-<!-- FIRST IMPRESSION -->
-<section>
-  <h2>Step 1: First Impression (50ms Test)</h2>
-  <div class="screenshot-grid">
-    <div class="screenshot-container">
-      <img src="svlp-screenshots/desktop-viewport.png" alt="Desktop above the fold">
-      <div class="caption">desktop-viewport.png — above the fold</div>
-    </div>
-    <div class="screenshot-container">
-      <img src="svlp-screenshots/mobile-viewport.png" alt="Mobile above the fold">
-      <div class="caption">mobile-viewport.png — above the fold</div>
-    </div>
-  </div>
-  <div class="card">
-    <h3>Rating: <span class="badge badge-hook verdict-badge">HOOK</span></h3>
-    <p style="color:var(--text);margin-top:12px;">
-      <strong>What I see first:</strong> Full nav bar (Products, Use Cases, Developers, Pricing, Resources), GitHub star count (20.7K), Login, and a prominent "Book a Demo" CTA. Below: "Check us out, we're open source" badge linking to GitHub. Then the hero: "AI agents to automate workflows <em>on any website</em>" with italic styling on the key differentiator. Sub-copy names the pain point (logging into portals, copy-pasting data). A dark product screenshot/video preview sits right of the hero text. Below: "Start Building" CTA + "HIPAA Compliant" and "SOC2 Compliant" badges.
-    </p>
-    <p style="color:var(--text);">
-      <strong>Do I know what this is?</strong> Yes, within 2 seconds. AI browser automation. The hero headline does the work. The sub-copy anchors it to a real problem (manual portal login, invoice downloading, form filling).
-    </p>
-    <p style="color:var(--text);">
-      <strong>Do I know what to do next?</strong> Yes. Two clear paths: "Start Building" (self-serve) or "Book a Demo" (sales-assisted). The open source badge invites developers to inspect the code first.
-    </p>
-    <p style="color:var(--text);">
-      <strong>Visual quality:</strong> Professional. Warm cream background (#f9f8f6), Plus Jakarta Sans typeface, teal accent on italic text, consistent spacing, dark product preview adds contrast. The nav is clean with proper hierarchy. Compliance badges below the CTA build immediate trust. This feels like a Series A+ startup with design resources.
-    </p>
-    <p style="color:var(--text);">
-      <strong>Trust check:</strong> Strong. GitHub stars (20.7K), Y Combinator badge, HIPAA + SOC2 compliance, client logos (CarEdge, pilot, Valence Intelligence, etc.), "20,000+ users &amp; customers" claim. Multiple trust vectors hit in the first viewport.
-    </p>
-  </div>
-</section>
+  <!-- EXECUTIVE SUMMARY -->
+  <section>
+    <h2><span class="step-num">00</span> Executive Summary</h2>
 
-<!-- WALK-THROUGH -->
-<section>
-  <h2>Step 2: The Walk-Through</h2>
+    <div class="card card-high">
+      <div class="exec-score">
+        <div>
+          <span class="number">19</span><span class="of">/35</span>
+        </div>
+        <div class="label">
+          Composite score across 7 UX dimensions.<br>
+          Two <span class="badge badge-blocker">BLOCKER</span> issues found. Zero working conversion paths.
+        </div>
+      </div>
+      <p>The Talent Signals site has a strong hero section and excellent copy. The signal feed visualization is genuinely compelling, showing real company data with live scoring. Typography is sharp (DM Sans + Outfit), spacing is consistent, and the dark aesthetic feels premium.</p>
+      <p>However, the primary conversion path ("Book a Demo") leads to a Calendly 404. The newsletter form captures zero data (preventDefault with no backend call). All page sections below the hero are invisible to crawlers and screenshot tools due to a JS IntersectionObserver animation bug. No pricing is shown anywhere.</p>
+      <p class="muted small">The site looks like a $50K build and converts like a broken landing page.</p>
+    </div>
 
-  <div class="step-card friction-none">
-    <div class="step-header">
-      <h4>Step 1: Landing on the homepage</h4>
-      <span class="badge badge-hook">LOW</span>
+    <div class="screenshot">
+      <img src="talentsignals-screenshots/desktop-viewport.png" alt="Desktop viewport - hero section">
+      <div class="screenshot-caption">Desktop hero: strong first impression, clear value prop, dual CTAs</div>
     </div>
-    <dl class="step-detail">
-      <dt>EXPECTS</dt><dd>To understand what Skyvern does and whether it's relevant to me</dd>
-      <dt>ACTUALLY</dt><dd>Clear hero: "AI agents to automate workflows on any website." Sub-copy names the exact pain (portal logins, invoices, copy-paste). Product preview video/screenshot to the right. Compliance badges below CTA.</dd>
-      <dt>SCREENSHOT</dt><dd>desktop-viewport.png</dd>
-      <dt>FEELS</dt><dd>Confident. "I know what this is, and they seem serious about it."</dd>
-      <dt>EVIDENCE</dt><dd>50ms aesthetic judgment (Lindgaard 2006). Trust established via GitHub stars + compliance badges in first viewport.</dd>
-      <dt>VISUAL</dt><dd>Nav items have dropdown indicators (Use Cases, Resources). Product preview is dark, creating strong contrast against cream background. The open source badge is a smart trust anchor for developers.</dd>
-      <dt>NOTE</dt><dd>"20.7K GitHub stars. That's real traction. Let me keep reading."</dd>
-    </dl>
-  </div>
+  </section>
 
-  <div class="step-card friction-none">
-    <div class="step-header">
-      <h4>Step 2: Scrolling to "Other browser agents skip the hard parts"</h4>
-      <span class="badge badge-hook">LOW</span>
-    </div>
-    <dl class="step-detail">
-      <dt>EXPECTS</dt><dd>Technical differentiation from competitors</dd>
-      <dt>ACTUALLY</dt><dd>Three-column feature grid: Uninterrupted Workflows (CAPTCHAs, bot detection), Code Cache &amp; State (blends LLMs with compiled code), Credential Management (2FA tokens, vault access). Each has an icon and specific copy.</dd>
-      <dt>SCREENSHOT</dt><dd>desktop-scroll-25.png (use case cards visible)</dd>
-      <dt>FEELS</dt><dd>Impressed. These are real technical challenges, not marketing fluff. They're naming specific pain points (CAPTCHAs, 2FA, bot detection).</dd>
-      <dt>EVIDENCE</dt><dd>NNGroup: specific, concrete claims build more trust than vague feature lists.</dd>
-      <dt>NOTE</dt><dd>"They know the actual problems. CAPTCHAs and 2FA are exactly where my Playwright scripts break."</dd>
-    </dl>
-  </div>
+  <hr class="divider">
 
-  <div class="step-card friction-low">
-    <div class="step-header">
-      <h4>Step 3: Use Cases section</h4>
-      <span class="badge badge-low">LOW</span>
-    </div>
-    <dl class="step-detail">
-      <dt>EXPECTS</dt><dd>Concrete examples of what I can automate</dd>
-      <dt>ACTUALLY</dt><dd>Six use case cards in a 3x2 grid: Document Processing, Accounts Payable, Data Extraction, Form Filling, Lead Gen &amp; Outreach, Testing &amp; QA. Each has an icon and 1-2 sentence description with specific outcomes.</dd>
-      <dt>SCREENSHOT</dt><dd>desktop-scroll-25.png</dd>
-      <dt>FEELS</dt><dd>Good mental model forming. I can map my needs to these categories.</dd>
-      <dt>EVIDENCE</dt><dd>Progressive disclosure: categories before details. Use Cases dropdown in nav also offers Healthcare, Insurance, Fintech &amp; Banking verticals.</dd>
-      <dt>VISUAL</dt><dd>Cards have subtle borders and icons. Clean layout. The "If it happens in a browser, Skyvern can run it" header above is a strong positioning statement.</dd>
-      <dt>NOTE</dt><dd>"Accounts Payable + Data Extraction are exactly my use case. Let me see how I'd actually build this."</dd>
-    </dl>
-  </div>
+  <!-- STEP 1: FIRST IMPRESSION -->
+  <section>
+    <h2><span class="step-num">01</span> First Impression (50ms Test)</h2>
 
-  <div class="step-card friction-none">
-    <div class="step-header">
-      <h4>Step 4: "Many ways to build" section</h4>
-      <span class="badge badge-hook">LOW</span>
+    <div class="card card-positive">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="badge badge-hook">HOOK</span>
+        <span style="font-weight:600;font-size:0.95rem;">Immediate clarity and visual intrigue</span>
+      </div>
+      <p>The desktop hero is excellent. The value proposition is immediately clear: "Know who's hiring before the job is posted." A live signal feed visualization shows real company names and scores, creating intrigue and credibility simultaneously. Two CTAs with clear hierarchy ("Book a Demo" primary, "See How It Works" outline). Social proof badge reads "20+ agencies."</p>
+      <p>The dark signal card creates visual differentiation from every other SaaS marketing site. Typography is sharp, spacing is consistent, and the overall aesthetic signals "premium intelligence tool" rather than "another recruiting platform."</p>
     </div>
-    <dl class="step-detail">
-      <dt>EXPECTS</dt><dd>How to actually create a workflow</dd>
-      <dt>ACTUALLY</dt><dd>Five build methods as interactive tabs: Copilot Chat (natural language), Upload SOPs (docs to workflows), Record Browser (show once, run forever), Visual Builder (drag/drop), REST API (code-first). Each tab shows a preview of the interface. The "Copilot Chat" tab shows a text input with an example prompt: "Go to vendor.acme.com, log in with our credentials, download all invoices from the..."</dd>
-      <dt>SCREENSHOT</dt><dd>interact-12-after.png (Copilot Chat selected)</dd>
-      <dt>FEELS</dt><dd>This is the "aha" moment. Five entry points means there's a path for everyone: non-technical (chat/record), semi-technical (visual builder), technical (API/SDK).</dd>
-      <dt>EVIDENCE</dt><dd>Multiple entry points reduce time to value. Each persona finds their path.</dd>
-      <dt>NOTE</dt><dd>"Upload SOPs is clever. I have process docs, and turning them into workflows automatically would save days."</dd>
-    </dl>
-  </div>
 
-  <div class="step-card friction-none">
-    <div class="step-header">
-      <h4>Step 5: Developer section + code samples</h4>
-      <span class="badge badge-hook">LOW</span>
+    <div class="card card-medium">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span class="badge badge-medium">MEDIUM</span>
+        <span style="font-weight:600;font-size:0.95rem;">Mobile: signal viz pushed below fold</span>
+      </div>
+      <p>On mobile (375px), the hero text renders well and CTAs are full-width and thumb-friendly. However, the signal visualization card, the most compelling visual element on the entire page, is pushed entirely below the fold. Mobile users miss the visual hook that makes desktop so effective.</p>
     </div>
-    <dl class="step-detail">
-      <dt>EXPECTS</dt><dd>API docs or integration details</dd>
-      <dt>ACTUALLY</dt><dd>"Developer-first automation" with bullet points: REST API, Self-hostable Docker, MCP ready, Webhooks. Code samples in Python and TypeScript with syntax highlighting. "Read the Documentation" CTA.</dd>
-      <dt>SCREENSHOT</dt><dd>desktop-scroll-50.png</dd>
-      <dt>FEELS</dt><dd>This is a real product with real developer tooling. The code sample is specific (10 lines, actual API call). MCP support is forward-looking.</dd>
-      <dt>NOTE</dt><dd>"They support MCP. That means I can plug this into my existing agent setup."</dd>
-    </dl>
-  </div>
 
-  <div class="step-card friction-low">
-    <div class="step-header">
-      <h4>Step 6: "Skyvern vs. the alternatives" comparison</h4>
-      <span class="badge badge-low">LOW</span>
+    <div class="screenshot-grid">
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/desktop-viewport.png" alt="Desktop first impression">
+        <div class="screenshot-caption">Desktop 1440px: full hero with signal viz</div>
+      </div>
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/mobile-viewport.png" alt="Mobile first impression">
+        <div class="screenshot-caption">Mobile 375px: signal viz below fold</div>
+      </div>
     </div>
-    <dl class="step-detail">
-      <dt>EXPECTS</dt><dd>Honest comparison with tools I've tried</dd>
-      <dt>ACTUALLY</dt><dd>Three-column comparison: vs. Playwright/Selenium ("selector-based scripts break"), vs. RPA Tools ("built for one-off tasks"), vs. Other AI Agents ("prompt-only agents hallucinate"). Each shows Problem then Skyvern's Solution.</dd>
-      <dt>SCREENSHOT</dt><dd>desktop-scroll-75.png</dd>
-      <dt>FEELS</dt><dd>Fair comparison. They're naming real weaknesses in each category without being dismissive. The "See Our Benchmark" CTA adds data credibility.</dd>
-      <dt>EVIDENCE</dt><dd>Competitive positioning that acknowledges alternatives builds trust (NNGroup: honest comparison outperforms feature dumps).</dd>
-      <dt>NOTE</dt><dd>"The Playwright comparison hits home. I've spent weeks maintaining selectors."</dd>
-    </dl>
-  </div>
+  </section>
 
-  <div class="step-card friction-none">
-    <div class="step-header">
-      <h4>Step 7: Security + Final CTA + Footer</h4>
-      <span class="badge badge-hook">LOW</span>
-    </div>
-    <dl class="step-detail">
-      <dt>EXPECTS</dt><dd>A way to get started</dd>
-      <dt>ACTUALLY</dt><dd>Security section (SOC2 Type II, HIPAA, E2E Encrypted Vault), impressive stats (20,500+ GitHub Stars, 500+ Enterprise Users, 99.9% Uptime SLA, 10M+ Workflows Run). Final CTA: "A better way to automate your workflows" with "Start Building" + "Book a Demo." Full footer with Product, Developers, Company links, social icons, legal pages.</dd>
-      <dt>SCREENSHOT</dt><dd>desktop-scroll-100.png</dd>
-      <dt>FEELS</dt><dd>Confident. The page built a convincing case from hero to CTA. Security at the end removes the last objection before conversion.</dd>
-      <dt>NOTE</dt><dd>"10M+ workflows run. That's production scale. I'm clicking Start Building."</dd>
-    </dl>
-  </div>
-</section>
+  <hr class="divider">
 
-<!-- MULTI-VIEWPORT -->
-<section>
-  <h2>Step 3: Multi-Viewport Analysis</h2>
-  <div class="screenshot-grid">
-    <div class="screenshot-container">
-      <img src="svlp-screenshots/desktop-full.png" alt="Desktop full page">
-      <div class="caption">desktop-full.png — note large blank sections (animation/lazy-load failure)</div>
+  <!-- STEP 2: WALK-THROUGH -->
+  <section>
+    <h2><span class="step-num">02</span> Cognitive Walk-Through</h2>
+    <p class="muted small mb-8">7-step simulated journey through the primary conversion funnel.</p>
+
+    <!-- Step 1 -->
+    <div class="walk-step">
+      <div class="step-header">
+        <span class="step-number">Step 1</span>
+        <span class="step-title">Land on homepage</span>
+        <span class="badge badge-low">LOW FRICTION</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Expects</span>
+        <span class="walk-value">Understand what this product is</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Actually</span>
+        <span class="walk-value">Immediately clear: recruiting intelligence platform. Badge reads "Recruiting Intelligence," H1 says "Know who's hiring before the job is posted." Signal feed shows live data with real company names.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Feels</span>
+        <span class="walk-value">Impressed, intrigued</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Evidence</span>
+        <span class="walk-value muted">50ms aesthetic judgment positive (Lindgaard 2006)</span>
+      </div>
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/desktop-viewport.png" alt="Step 1 - Landing">
+        <div class="screenshot-caption">desktop-viewport.png</div>
+      </div>
     </div>
-    <div class="screenshot-container">
-      <img src="svlp-screenshots/tablet-viewport.png" alt="Tablet viewport">
-      <div class="caption">tablet-viewport.png</div>
+
+    <!-- Step 2 -->
+    <div class="walk-step">
+      <div class="step-header">
+        <span class="step-number">Step 2</span>
+        <span class="step-title">Read hero, decide to act</span>
+        <span class="badge badge-low">LOW FRICTION</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Expects</span>
+        <span class="walk-value">Clear next step</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Actually</span>
+        <span class="walk-value">Two CTAs with clear hierarchy. "Book a Demo" (primary dark button) and "See How It Works" (outline). Demo note says "We'll run your niche live on the call." Good micro-copy that reduces commitment anxiety.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Feels</span>
+        <span class="walk-value">Confident, ready to act</span>
+      </div>
     </div>
-    <div class="screenshot-container">
-      <img src="svlp-screenshots/mobile-viewport.png" alt="Mobile viewport">
-      <div class="caption">mobile-viewport.png</div>
+
+    <!-- Step 3 -->
+    <div class="walk-step" style="border-left: 3px solid var(--red);">
+      <div class="step-header">
+        <span class="step-number">Step 3</span>
+        <span class="step-title">Click "Book a Demo"</span>
+        <span class="badge badge-blocker">BLOCKER</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Expects</span>
+        <span class="walk-value">Calendly scheduling page to pick a time</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Actually</span>
+        <span class="walk-value" style="color:var(--red);">Calendly 404. "Page not found. Sorry, but the page you were looking for could not be found." The entire conversion funnel is dead.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Feels</span>
+        <span class="walk-value" style="color:var(--red);font-weight:600;">FRUSTRATED. Primary conversion path completely broken.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Evidence</span>
+        <span class="walk-value muted">NNGroup heuristic #1 (visibility of system status), #5 (error prevention)</span>
+      </div>
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/funnel-cta-0.png" alt="Step 3 - Calendly 404">
+        <div class="screenshot-caption">funnel-cta-0.png: Calendly 404 on primary CTA click</div>
+      </div>
     </div>
-  </div>
-  <div class="card-grid">
+
+    <!-- Step 4 -->
+    <div class="walk-step">
+      <div class="step-header">
+        <span class="step-number">Step 4</span>
+        <span class="step-title">Scroll to explore products</span>
+        <span class="badge badge-medium">MEDIUM</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Expects</span>
+        <span class="walk-value">Learn about offerings</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Actually</span>
+        <span class="walk-value">Three product cards (Recruit, Coach, Search) with clear segmentation, feature lists, and individual CTAs. Well-structured information architecture. Product cards have a nice hover state with cyan left border highlight.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Feels</span>
+        <span class="walk-value">Recovering from CTA frustration. The content is genuinely good.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Friction</span>
+        <span class="walk-value muted">Three audiences dilute focus for any single visitor. A recruiting director doesn't care about job seekers.</span>
+      </div>
+      <div class="screenshot-grid">
+        <div class="screenshot">
+          <img src="talentsignals-screenshots/desktop-scroll-25.png" alt="Step 4 - Products">
+          <div class="screenshot-caption">desktop-scroll-25.png</div>
+        </div>
+        <div class="screenshot">
+          <img src="talentsignals-screenshots/hover-9-after.png" alt="Product card hover state">
+          <div class="screenshot-caption">hover-9-after.png: card hover state</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 5 -->
+    <div class="walk-step" style="border-left: 3px solid var(--amber);">
+      <div class="step-header">
+        <span class="step-number">Step 5</span>
+        <span class="step-title">Read "What our clients are seeing"</span>
+        <span class="badge badge-high">HIGH</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Expects</span>
+        <span class="walk-value">Real testimonials with names and photos</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Actually</span>
+        <span class="walk-value">Generic outcome descriptions with emoji icons (satellite dish, chart, target). No client names, no photos, no real quotes. Reads as marketing claims, not evidence.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Feels</span>
+        <span class="walk-value" style="color:var(--amber);">Skeptical. "Where are the real clients?"</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Friction</span>
+        <span class="walk-value muted">Trust damage at the critical social proof section. This is where conversion-ready visitors look for validation.</span>
+      </div>
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/desktop-scroll-75.png" alt="Step 5 - Testimonials">
+        <div class="screenshot-caption">desktop-scroll-75.png: generic testimonials with emoji icons</div>
+      </div>
+    </div>
+
+    <!-- Step 6 -->
+    <div class="walk-step" style="border-left: 3px solid var(--amber);">
+      <div class="step-header">
+        <span class="step-number">Step 6</span>
+        <span class="step-title">Newsletter signup</span>
+        <span class="badge badge-high">HIGH</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Expects</span>
+        <span class="walk-value">Subscribe to get weekly insights</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Actually</span>
+        <span class="walk-value" style="color:var(--amber);">Form accepts email, shows green checkmark "You're on the list." But the form handler uses preventDefault() and never sends data anywhere. Zero emails are captured. Every newsletter lead is lost.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Feels</span>
+        <span class="walk-value">Would feel good (success message shows), but it's a lie. Invisible to the user, catastrophic for the business.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Evidence</span>
+        <span class="walk-value muted">Code analysis: addEventListener('submit', e => e.preventDefault()) with no fetch/XHR call</span>
+      </div>
+    </div>
+
+    <!-- Step 7 -->
+    <div class="walk-step" style="border-left: 3px solid var(--red);">
+      <div class="step-header">
+        <span class="step-number">Step 7</span>
+        <span class="step-title">Final CTA section</span>
+        <span class="badge badge-blocker">BLOCKER</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Expects</span>
+        <span class="walk-value">Last chance to convert</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Actually</span>
+        <span class="walk-value" style="color:var(--red);">"See what your system would find this week" with Book a Demo and Get the Newsletter. Both paths are broken. Calendly 404 + fake newsletter form. The page ends on two dead paths.</span>
+      </div>
+      <div class="walk-row">
+        <span class="walk-label">Feels</span>
+        <span class="walk-value" style="color:var(--red);font-weight:600;">Deflated. No working conversion path exists on the entire site.</span>
+      </div>
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/desktop-scroll-100.png" alt="Step 7 - Final CTA">
+        <div class="screenshot-caption">desktop-scroll-100.png: both final CTAs lead to dead ends</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- STEP 3: MULTI-VIEWPORT -->
+  <section>
+    <h2><span class="step-num">03</span> Multi-Viewport Analysis</h2>
+
+    <div class="viewport-grid">
+      <div class="viewport-card">
+        <div class="viewport-label">Desktop 1440px</div>
+        <img src="talentsignals-screenshots/desktop-viewport.png" alt="Desktop viewport">
+      </div>
+      <div class="viewport-card">
+        <div class="viewport-label">Tablet 768px</div>
+        <img src="talentsignals-screenshots/tablet-viewport.png" alt="Tablet viewport">
+      </div>
+      <div class="viewport-card">
+        <div class="viewport-label">Mobile 375px</div>
+        <img src="talentsignals-screenshots/mobile-viewport.png" alt="Mobile viewport">
+      </div>
+    </div>
+
     <div class="card">
       <h3>Desktop (1440px)</h3>
-      <p>Clean layout. Two-column hero (text + product preview). Three-column grids for features and use cases. Tab-style "Many ways to build" section works well. Full nav + footer. Load: 1,290ms (excellent).</p>
-      <p><strong>Issues:</strong> Nav items and footer links are 18-19.5px tall (fail 44px tap target, but fine for desktop mouse). Discord icon is 32x32 (fails tap target).</p>
+      <p>Layout is excellent. Hero uses a 2-column grid with text and signal viz side by side. Products render in a 3-column grid with consistent spacing. Sticky nav is clean and minimal. This is the best experience.</p>
     </div>
+
     <div class="card">
       <h3>Tablet (768px)</h3>
-      <p>Adapts well. Hero stacks vertically. Nav collapses to hamburger with "Book a Demo" prominent. Cards reflow to single column. Load: 1,383ms.</p>
-      <p><strong>Issues:</strong> Same blank section problem in full-page screenshot. The massive empty areas suggest scroll-triggered animations that don't fire for static captures.</p>
+      <p>Layout adapts well to single-column. Signal viz appears directly below hero text, still above the fold. All content is readable. No layout breakage observed.</p>
     </div>
+
+    <div class="card card-medium">
+      <h3>Mobile (375px) <span class="badge badge-medium">MEDIUM</span></h3>
+      <p>Text is readable and CTAs are full-width and thumb-friendly. However, the signal visualization card is pushed far below the fold, meaning mobile users miss the most compelling visual element entirely. Navigation tap targets are 38px tall, failing the WCAG 2.5.8 recommended minimum of 44x44px.</p>
+    </div>
+
+    <div class="screenshot-grid">
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/desktop-full.png" alt="Desktop full page">
+        <div class="screenshot-caption">desktop-full.png: note blank sections (JS animation bug)</div>
+      </div>
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/mobile-full.png" alt="Mobile full page">
+        <div class="screenshot-caption">mobile-full.png: full mobile render</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- STEP 4: EMOTIONAL ARC -->
+  <section>
+    <h2><span class="step-num">04</span> Emotional Arc</h2>
+    <p class="muted small mb-8">User sentiment tracked across the 7-step journey. Trajectory: <strong style="color:var(--red);">PEAK-TO-VALLEY</strong>. Starts at the highest point and drops.</p>
+
     <div class="card">
-      <h3>Mobile (375px)</h3>
-      <p>Intentional mobile layout. Text centered, readable at 16px base. "Start Building" CTA is full-width and prominent. Hamburger menu with "Book a Demo" visible. Load: 1,298ms (excellent for mobile).</p>
-      <p><strong>Issues:</strong> Same blank sections in full-page screenshot. The product preview video is pushed below the fold. 877 total elements is heavy for mobile, but load time is good.</p>
+      <div class="arc-bar">
+        <div class="arc-col">
+          <div class="arc-score score-4">5</div>
+          <div class="arc-fill" style="height:100%;background:var(--green);"></div>
+          <div class="arc-label">S1<br>Impressed</div>
+        </div>
+        <div class="arc-col">
+          <div class="arc-score score-4">4</div>
+          <div class="arc-fill" style="height:76%;background:var(--green);"></div>
+          <div class="arc-label">S2<br>Confident</div>
+        </div>
+        <div class="arc-col">
+          <div class="arc-score score-1">1</div>
+          <div class="arc-fill" style="height:16%;background:var(--red);"></div>
+          <div class="arc-label">S3<br>Frustrated</div>
+        </div>
+        <div class="arc-col">
+          <div class="arc-score score-3">3</div>
+          <div class="arc-fill" style="height:52%;background:var(--amber);"></div>
+          <div class="arc-label">S4<br>Recovering</div>
+        </div>
+        <div class="arc-col">
+          <div class="arc-score score-2">2</div>
+          <div class="arc-fill" style="height:32%;background:var(--red);"></div>
+          <div class="arc-label">S5<br>Skeptical</div>
+        </div>
+        <div class="arc-col">
+          <div class="arc-score score-3">3</div>
+          <div class="arc-fill" style="height:52%;background:var(--amber);"></div>
+          <div class="arc-label">S6<br>Neutral</div>
+        </div>
+        <div class="arc-col">
+          <div class="arc-score score-2">2</div>
+          <div class="arc-fill" style="height:32%;background:var(--red);"></div>
+          <div class="arc-label">S7<br>Deflated</div>
+        </div>
+      </div>
+      <p class="small muted mt-16">The journey peaks at Step 1 (strong hero) and crashes at Step 3 (Calendly 404). Partial recovery at Step 4 (good content), but erosion through Steps 5-7 as trust signals fail and both conversion paths prove broken. A visitor who clicks "Book a Demo" never comes back.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- EMOTIONAL ARC -->
-<section>
-  <h2>Step 4: Emotional Arc</h2>
-  <div class="emotional-arc">
-    <div class="emotion-chip" style="border-color:var(--green-dim);">Step 1: Confident <span class="conf">4/5</span></div>
-    <div class="emotion-chip" style="border-color:var(--green-dim);">Step 2: Impressed <span class="conf">4/5</span></div>
-    <div class="emotion-chip" style="border-color:var(--green-dim);">Step 3: Oriented <span class="conf">4/5</span></div>
-    <div class="emotion-chip" style="border-color:var(--green-dim);">Step 4: Excited <span class="conf">5/5</span></div>
-    <div class="emotion-chip" style="border-color:var(--green-dim);">Step 5: Validated <span class="conf">4/5</span></div>
-    <div class="emotion-chip" style="border-color:var(--green-dim);">Step 6: Convinced <span class="conf">4/5</span></div>
-    <div class="emotion-chip" style="border-color:var(--green-dim);">Step 7: Ready <span class="conf">5/5</span></div>
-  </div>
-  <div class="card">
-    <p style="color:var(--text);"><strong>Overall trajectory: rising</strong></p>
-    <p>A textbook ascending arc. Confidence starts high (clear hero), builds through technical differentiation, peaks at the "Many ways to build" section (the "aha" moment where five entry points mean every persona finds their path), sustains through developer tooling and competitive comparison, and closes at conversion-readiness. No valleys, no confusion. The security section at the end removes the last enterprise objection.</p>
-    <p><strong>Peak:</strong> The "Many ways to build" tab interface. This is where the product goes from "interesting concept" to "I can see myself using this." The Copilot Chat example with a real prompt is the moment of highest engagement.</p>
-  </div>
-</section>
+  <hr class="divider">
 
-<!-- FRICTION INVENTORY -->
-<section>
-  <h2>Step 5: Friction Inventory</h2>
+  <!-- STEP 5: FRICTION INVENTORY -->
+  <section>
+    <h2><span class="step-num">05</span> Friction Inventory</h2>
 
-  <div class="step-card friction-high">
-    <div class="step-header">
-      <h4>Blank sections in full-page screenshot (~60% of page height)</h4>
-      <span class="badge badge-high">HIGH</span>
+    <h3 style="color:var(--red);">Blockers</h3>
+
+    <div class="card card-blocker">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-blocker">BLOCKER</span>
+        <span style="font-weight:600;font-size:0.95rem;">#1: "Book a Demo" Calendly link is a 404</span>
+      </div>
+      <p>The primary conversion CTA across the entire site links to a Calendly page that returns a 404 error. This affects Steps 3 and 7. Every visitor ready to convert hits a dead end.</p>
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/funnel-cta-0.png" alt="Calendly 404">
+        <div class="screenshot-caption">funnel-cta-0.png: Calendly "Page not found"</div>
+      </div>
     </div>
-    <p>The desktop-full.png reveals massive empty white/cream areas between sections. The hero + client logos render, then blank space, then a small section, then more blank space. This suggests scroll-triggered animations, lazy-loaded content, or intersection observer patterns that don't fire during static full-page capture. This means: (1) search engine crawlers see an incomplete page, (2) users on slow connections may see blanks during load, (3) social media preview cards (og:image) would show empty content.</p>
-    <p><strong>Evidence:</strong> desktop-full.png (page is 15,052px tall but rendered content fills maybe 5,000px)</p>
-    <p><strong>Research:</strong> Google penalizes pages with significant above-the-fold content shifts. Lazy-loaded critical content may not be indexed.</p>
-  </div>
 
-  <div class="step-card friction-medium">
-    <div class="step-header">
-      <h4>Nav items and footer links fail tap target minimums</h4>
-      <span class="badge badge-medium">MEDIUM</span>
+    <div class="card card-blocker">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-blocker">BLOCKER</span>
+        <span style="font-weight:600;font-size:0.95rem;">#2: Page sections invisible to crawlers and screenshot tools</span>
+      </div>
+      <p>All sections below the hero use a JS IntersectionObserver-based fade-up animation that hides content (opacity: 0, transform: translateY) until triggered by scroll. The 1.5-second fallback timeout is not fast enough for crawlers, social preview generators, or screenshot tools. The full-page screenshot shows massive blank space where content should be.</p>
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/desktop-full.png" alt="Invisible sections">
+        <div class="screenshot-caption">desktop-full.png: blank sections where content is hidden by JS animation</div>
+      </div>
     </div>
-    <p>Manifest shows many interactive elements at 18-19.5px height (well below 44px WCAG minimum). Nav items: Products (57x19.5), Use Cases (80x19.5), Pricing (43x19.5). Footer links: Features (58x18), Pricing (45x18). Discord icon in header is 32x32. These are fine for desktop mouse users but fail mobile touch standards.</p>
-    <p><strong>Evidence:</strong> Manifest interactiveElements: tapTargetOk = false on ~15 elements</p>
-  </div>
 
-  <div class="step-card friction-medium">
-    <div class="step-header">
-      <h4>"Book a Demo" buttons are buttons, not links (no href)</h4>
-      <span class="badge badge-medium">MEDIUM</span>
-    </div>
-    <p>Multiple "Book a Demo" buttons are <code>&lt;button type="submit"&gt;</code> elements, not anchor tags. They presumably trigger JavaScript navigation or a modal. This means: (1) they won't work with JavaScript disabled, (2) users can't right-click to open in new tab, (3) screen readers may not announce a navigation destination. The footer "Book a Demo" IS a proper link to meetings.hubspot.com/skyvern/demo, creating an inconsistency.</p>
-    <p><strong>Evidence:</strong> Manifest: interactiveElements index 9 (header "Book a Demo") is button type="submit" with no href. Index 46 (footer) is a proper link.</p>
-  </div>
+    <h3 style="color:var(--amber);" class="mt-16">High Priority</h3>
 
-  <div class="step-card friction-medium">
-    <div class="step-header">
-      <h4>"Start Building" buttons also lack href</h4>
-      <span class="badge badge-medium">MEDIUM</span>
+    <div class="card card-high">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-high">HIGH</span>
+        <span style="font-weight:600;font-size:0.95rem;">#3: Newsletter form captures zero data</span>
+      </div>
+      <p>The newsletter form uses <code style="font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--accent);background:var(--accent-dim);padding:2px 6px;border-radius:3px;">preventDefault()</code> with no backend call. Shows a green checkmark and "You're on the list" success message, but never sends the email address anywhere. Every newsletter lead is permanently lost.</p>
     </div>
-    <p>Same issue as "Book a Demo." The primary conversion CTA is a button, not a link. Users who middle-click or Cmd+click to open in a new tab get nothing. This applies to "Get Started Free," "Start Building," "See Our Benchmark," "View All Integrations," and "Read the Documentation."</p>
-    <p><strong>Evidence:</strong> Manifest: interactiveElements index 12, 13, 14, 25, 26, 29, 30, 31 are all button type="submit" with no href</p>
-  </div>
 
-  <div class="step-card friction-low">
-    <div class="step-header">
-      <h4>No customer testimonials or quotes</h4>
-      <span class="badge badge-low">LOW</span>
+    <div class="card card-high">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-high">HIGH</span>
+        <span style="font-weight:600;font-size:0.95rem;">#4: Testimonials have no real clients</span>
+      </div>
+      <p>The "What our clients are seeing" section uses emoji icons and generic outcome descriptions instead of real client names, photos, roles, or quotes. At the critical social proof section where conversion-ready visitors look for validation, the content reads as fabricated marketing claims.</p>
+      <div class="screenshot">
+        <img src="talentsignals-screenshots/desktop-scroll-75.png" alt="Fake testimonials">
+        <div class="screenshot-caption">desktop-scroll-75.png: emoji icons where client photos should be</div>
+      </div>
     </div>
-    <p>Client logos are present (CarEdge, pilot, Valence Intelligence, etc.) and stats are impressive (20K+ stars, 500+ enterprise users, 10M+ workflows). But there are zero customer quotes, case study links, or testimonials. Adding even 1-2 specific customer outcomes would strengthen the social proof beyond logos.</p>
-  </div>
 
-  <div class="step-card friction-low">
-    <div class="step-header">
-      <h4>Hosted on replit.app subdomain</h4>
-      <span class="badge badge-low">LOW</span>
+    <div class="card card-high">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-high">HIGH</span>
+        <span style="font-weight:600;font-size:0.95rem;">#5: No pricing information anywhere</span>
+      </div>
+      <p>"Pricing discussed on the call" gives zero anchor. Prospects cannot self-qualify and will self-select out without knowing whether this costs $500 or $50,000. Even a starting range ("Systems start at $X") would improve conversion.</p>
     </div>
-    <p>The URL is svlp-v2.replit.app, not skyvern.com. This is clearly a staging/preview URL. For production, this would need to be on the primary domain. Not an issue if this is a staging review, but noting it for completeness.</p>
-  </div>
-</section>
 
-<!-- VERDICT -->
-<section>
-  <h2>Step 6: The Verdict</h2>
-  <div class="card-grid">
-    <div class="card">
-      <h3>Would I use this again?</h3>
-      <p style="color:var(--green);font-weight:600;font-size:1.1rem;">YES</p>
-      <p>The landing page convinced me to try the product. Clear value prop, multiple entry points, developer-friendly, open source credibility.</p>
-    </div>
-    <div class="card">
-      <h3>Would I recommend this?</h3>
-      <p>"If you're maintaining Playwright scripts or doing manual portal work, look at Skyvern. They handle CAPTCHAs, 2FA, and bot detection natively. 20K GitHub stars, open source."</p>
-    </div>
-    <div class="card">
-      <h3>The one thing that needs to change</h3>
-      <p style="color:var(--orange);font-weight:500;">Fix the blank sections in the full-page render. If ~60% of the page is invisible to crawlers and potentially to users on slow connections, the excellent content below the fold is wasted.</p>
-    </div>
-    <div class="card">
-      <h3>What surprised me positively</h3>
-      <p>The "Many ways to build" section with five entry points (Chat, SOPs, Record, Visual, API) is genuinely differentiated. Most tools offer one path. The "Upload SOPs" approach is unique and immediately appealing to ops teams.</p>
-    </div>
-  </div>
-  <div class="card" style="margin-top:16px;">
-    <div class="card-grid" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr));">
-      <div><strong>Trust level:</strong> <span style="color:var(--green);">5/5</span> (GitHub stars, YC, SOC2, HIPAA, client logos)</div>
-      <div><strong>Quality feel:</strong> <span style="color:var(--text);">Professional</span> (approaching premium)</div>
-      <div><strong>Time to value:</strong> <span style="color:var(--green);">Immediate</span> (clear CTA above fold)</div>
-      <div><strong>Responsive:</strong> <span style="color:var(--green);">Good</span> (intentional mobile layout, fast load)</div>
-      <div><strong>Interactive:</strong> <span style="color:var(--green);">Good</span> (tab interface works, dropdowns functional)</div>
-    </div>
-  </div>
-</section>
+    <h3 style="color:var(--blue);" class="mt-16">Medium Priority</h3>
 
-<!-- SCORECARD -->
-<section>
-  <h2>Step 6.5: Dimension Scorecard</h2>
-  <div class="card">
-    <table class="scorecard">
-      <thead><tr><th>Dimension</th><th>Rationale</th><th>Score</th></tr></thead>
-      <tbody>
-        <tr>
-          <td style="color:var(--text);">First Impression</td>
-          <td>Clear hero, strong trust signals, professional design, immediate value communication. Above-fold has everything needed.</td>
-          <td><span class="score score-5">5</span></td>
-        </tr>
-        <tr>
-          <td style="color:var(--text);">Navigation &amp; Flow</td>
-          <td>Full nav with dropdowns, proper footer, logical page flow from problem to solution to CTA. Use Cases dropdown offers vertical-specific paths. Excellent information architecture.</td>
-          <td><span class="score score-5">5</span></td>
-        </tr>
-        <tr>
-          <td style="color:var(--text);">Emotional Arc</td>
-          <td>Steadily ascending. No confusion, no valleys. Peak at "Many ways to build." Ends at conversion-readiness.</td>
-          <td><span class="score score-4">4</span></td>
-        </tr>
-        <tr>
-          <td style="color:var(--text);">Trust &amp; Polish</td>
-          <td>GitHub stars, YC, SOC2, HIPAA, client logos, 20K+ users, 10M+ workflows, E2E vault. Deducted for: no customer testimonials, buttons-not-links pattern.</td>
-          <td><span class="score score-4">4</span></td>
-        </tr>
-        <tr>
-          <td style="color:var(--text);">Time to Value</td>
-          <td>"Start Building" CTA above fold. "Get Started Free" at mid-page. Five build methods clearly presented. Minimal friction to first action.</td>
-          <td><span class="score score-4">4</span></td>
-        </tr>
-        <tr>
-          <td style="color:var(--text);">Responsive Quality</td>
-          <td>Load times excellent across all viewports (1.2-1.4s). Mobile layout is intentional with hamburger menu and prominent CTA. Deducted for: blank sections in full-page render, some tap targets below 44px.</td>
-          <td><span class="score score-3">3</span></td>
-        </tr>
-        <tr>
-          <td style="color:var(--text);">Interactive Quality</td>
-          <td>Tab interface for build methods works. Nav dropdowns functional (Use Cases shows Healthcare, Insurance, Fintech). Hover states on nav present. Deducted for: buttons-not-links on CTAs (no right-click open in new tab), blank animated sections.</td>
-          <td><span class="score score-3">3</span></td>
-        </tr>
-        <tr class="composite-row">
-          <td>COMPOSITE</td><td></td>
-          <td><span class="score" style="color:var(--amber);font-size:1.3rem;">28/35</span></td>
-        </tr>
-        <tr>
-          <td style="color:var(--amber);">LOWEST</td>
-          <td style="color:var(--amber);">Responsive Quality &amp; Interactive Quality (tied at 3): blank sections + buttons-not-links</td>
-          <td><span class="score score-3">3</span></td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</section>
-
-<!-- PRIORITY FIXES -->
-<section>
-  <h2>Step 7: Priority Fix List</h2>
-
-  <div class="fix-card">
-    <div class="fix-num">1</div>
-    <h3>Fix blank sections: ensure content renders without scroll triggers</h3>
-    <p style="color:var(--text);">The full-page screenshots show ~60% blank space. This is likely intersection observer or scroll-triggered animations that don't fire for crawlers/static captures. Fix: ensure all content is in the DOM and visible by default, then ENHANCE with animations on scroll. Use CSS opacity animations triggered by intersection observer, but set the base opacity to 1 (not 0). This way crawlers, social previews, and slow-JS environments see full content.</p>
-    <div class="fix-meta">
-      <span class="tag">DIMENSION: Responsive + Interactive</span>
-      <span class="tag">EFFORT: Moderate</span>
-      <span class="tag">IMPACT: SEO, social sharing, slow-connection users</span>
-      <span class="tag">EVIDENCE: desktop-full.png</span>
+    <div class="card card-medium">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-medium">MEDIUM</span>
+        <span style="font-weight:600;font-size:0.95rem;">#6: Three audiences dilute focus</span>
+      </div>
+      <p>Recruit, Coach, and Search products compete for attention. A recruiting director visiting the site doesn't care about job seeker tools. Consider audience-specific landing pages or a clearer primary audience signal.</p>
     </div>
-  </div>
 
-  <div class="fix-card">
-    <div class="fix-num">2</div>
-    <h3>Convert button CTAs to proper anchor links</h3>
-    <p style="color:var(--text);">All primary CTAs ("Start Building," "Book a Demo," "Get Started Free," "See Our Benchmark," "View All Integrations," "Read the Documentation") are &lt;button type="submit"&gt; elements with no href. Convert to &lt;a&gt; tags styled as buttons. This enables: right-click open in new tab, screen reader destination announcement, works without JS, better SEO for internal linking.</p>
-    <div class="fix-meta">
-      <span class="tag">DIMENSION: Interactive Quality, Trust</span>
-      <span class="tag">EFFORT: Quick fix</span>
-      <span class="tag">IMPACT: Accessibility, SEO, power user UX</span>
-      <span class="tag">EVIDENCE: Manifest: 10+ buttons with no href</span>
+    <div class="card card-medium">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-medium">MEDIUM</span>
+        <span style="font-weight:600;font-size:0.95rem;">#7: Signal viz invisible on mobile</span>
+      </div>
+      <p>The most compelling visual element on the site (the live signal feed card) is pushed entirely below the fold on mobile. Mobile visitors see only text and CTAs without the visual hook that makes the desktop experience memorable.</p>
     </div>
-  </div>
 
-  <div class="fix-card">
-    <div class="fix-num">3</div>
-    <h3>Add 1-2 customer testimonials with outcomes</h3>
-    <p style="color:var(--text);">Client logos and stats are strong, but zero customer quotes means the social proof is one-dimensional. Add 1-2 short testimonials with specific outcomes: "Skyvern replaced 40 hours/week of manual portal work for our accounts payable team." Place between the use cases section and the "Ready to automate" CTA for maximum conversion impact.</p>
-    <div class="fix-meta">
-      <span class="tag">DIMENSION: Trust &amp; Polish</span>
-      <span class="tag">EFFORT: Quick fix (if quotes exist)</span>
-      <span class="tag">IMPACT: Emotional arc peak + conversion lift</span>
+    <div class="card card-medium">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-medium">MEDIUM</span>
+        <span style="font-weight:600;font-size:0.95rem;">#8: Nav link tap targets fail 44x44 minimum</span>
+      </div>
+      <p>Navigation links measure 38px in height on mobile, below the WCAG 2.5.8 recommended minimum of 44x44px. This increases mis-tap risk on mobile devices.</p>
     </div>
-  </div>
 
-  <div class="fix-card">
-    <div class="fix-num">4</div>
-    <h3>Increase tap target sizes for nav and footer links</h3>
-    <p style="color:var(--text);">Nav items are 19.5px tall, footer links are 18px tall. Add padding to meet 44px minimum for touch targets. The Discord icon in the header (32x32) also needs padding. This matters for tablet users who see the full nav but interact with touch.</p>
-    <div class="fix-meta">
-      <span class="tag">DIMENSION: Responsive Quality</span>
-      <span class="tag">EFFORT: Quick fix</span>
-      <span class="tag">IMPACT: WCAG compliance, tablet usability</span>
+    <h3 style="color:var(--slate);" class="mt-16">Low Priority</h3>
+
+    <div class="card card-low">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-low">LOW</span>
+        <span style="font-weight:600;font-size:0.95rem;">#9: Typographic inconsistency</span>
+      </div>
+      <p>19 unique font sizes and 30 unique colors detected across the page. Best practice recommends 6-8 font sizes maximum. While not user-facing friction, this suggests a design system that will drift further over time.</p>
     </div>
-  </div>
 
-  <div class="fix-card">
-    <div class="fix-num">5</div>
-    <h3>Add a product demo video/GIF that auto-plays on the hero</h3>
-    <p style="color:var(--text);">The dark product preview in the hero appears to be a static image or a video that didn't auto-play during capture. If it's a video, ensure it auto-plays (muted) to show the product in action. If it's static, consider replacing with a short GIF showing a workflow running. Seeing the product work is the strongest possible hook for a developer tool.</p>
-    <div class="fix-meta">
-      <span class="tag">DIMENSION: First Impression, Emotional Arc</span>
-      <span class="tag">EFFORT: Moderate</span>
-      <span class="tag">IMPACT: "Show don't tell" for the hero moment</span>
+    <div class="card card-low">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+        <span class="badge badge-low">LOW</span>
+        <span style="font-weight:600;font-size:0.95rem;">#10: "Backed by Ben AI" reveals parent brand</span>
+      </div>
+      <p>The footer attribution to Ben AI may undermine Talent Signals' standalone positioning. Visitors may question whether this is a real product or a side project.</p>
     </div>
-  </div>
-</section>
+  </section>
 
-</div>
+  <hr class="divider">
 
-<div class="footer">
-  Generated by /human-experience — Vision-Powered UX Simulation Engine v2<br>
-  Confidence: HIGH (42 captures + 14 CTA funnel destinations + manifest at 3 viewports)<br>
-  2026-03-10
+  <!-- STEP 6: VERDICT -->
+  <section>
+    <h2><span class="step-num">06</span> Verdict</h2>
+
+    <div class="verdict-grid">
+      <div class="verdict-item">
+        <div class="verdict-q">Would I use this again?</div>
+        <div class="verdict-a negative">NO. Can't book a demo, can't subscribe. Zero working conversion paths.</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-q">Would I recommend?</div>
+        <div class="verdict-a caution">"Great looking site, but try clicking Book a Demo..."</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-q">One thing to change?</div>
+        <div class="verdict-a neutral">Fix the Calendly link. Everything else is secondary.</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-q">Positive surprise?</div>
+        <div class="verdict-a positive">The signal feed visualization is genuinely compelling. Real company data, live scoring. Best hero visual on a recruiting SaaS site.</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-q">Trust level</div>
+        <div class="verdict-a negative">2/5. Broken CTA + fake testimonials + dead newsletter.</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-q">Quality feel</div>
+        <div class="verdict-a caution">Professional. Would be premium if CTAs worked.</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-q">Time to first value</div>
+        <div class="verdict-a negative">INFINITE. Cannot complete any conversion action.</div>
+      </div>
+      <div class="verdict-item">
+        <div class="verdict-q">Responsive quality</div>
+        <div class="verdict-a positive">Good. Minor mobile issues (signal viz, tap targets).</div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider">
+
+  <!-- STEP 6.5: DIMENSION SCORECARD -->
+  <section>
+    <h2><span class="step-num">06.5</span> Dimension Scorecard</h2>
+
+    <div class="scorecard">
+      <div class="scorecard-grid">
+        <span class="dim-name">First Impression</span>
+        <span class="dim-score score-4">4 / 5</span>
+
+        <span class="dim-name">Navigation & Flow</span>
+        <span class="dim-score score-2">2 / 5</span>
+
+        <span class="dim-name">Emotional Arc</span>
+        <span class="dim-score score-2">2 / 5</span>
+
+        <span class="dim-name">Trust & Polish</span>
+        <span class="dim-score score-2">2 / 5</span>
+
+        <span class="dim-name">Time to Value</span>
+        <span class="dim-score score-2">2 / 5</span>
+
+        <span class="dim-name">Responsive Quality</span>
+        <span class="dim-score score-3">3 / 5</span>
+
+        <span class="dim-name">Interactive Quality</span>
+        <span class="dim-score score-4">4 / 5</span>
+      </div>
+      <div class="composite">
+        <span class="label">Composite Score</span>
+        <span class="score">19 / 35</span>
+      </div>
+    </div>
+
+    <p class="small muted">Lowest dimensions: Navigation & Flow, Emotional Arc, Trust & Polish, and Time to Value (all at 2/5). The site's visual and interactive quality (First Impression 4, Interactive Quality 4) is dramatically undermined by broken conversion paths and missing trust signals.</p>
+  </section>
+
+  <hr class="divider">
+
+  <!-- STEP 7: PRIORITY FIX LIST -->
+  <section>
+    <h2><span class="step-num">07</span> Priority Fix List</h2>
+    <p class="muted small mb-8">Ordered by impact. Fix #1 alone would move the composite score from 19 to ~24.</p>
+
+    <div class="fix-item" style="border-left:3px solid var(--red);">
+      <div class="fix-header">
+        <span class="fix-num">1</span>
+        <span class="fix-title">Fix "Book a Demo" CTA</span>
+        <span class="badge badge-blocker">BLOCKER</span>
+      </div>
+      <p>Replace the broken Calendly URL with a working booking link, or add a temporary <code style="font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--accent);background:var(--accent-dim);padding:2px 6px;border-radius:3px;">mailto:</code> fallback. This single fix unblocks all conversion.</p>
+      <div class="fix-meta">
+        <span>Effort: Quick fix</span>
+        <span>Impact: Unblocks all conversion</span>
+        <span>Dimensions: Navigation & Flow, Time to Value</span>
+      </div>
+    </div>
+
+    <div class="fix-item" style="border-left:3px solid var(--red);">
+      <div class="fix-header">
+        <span class="fix-num">2</span>
+        <span class="fix-title">Fix invisible sections</span>
+        <span class="badge badge-blocker">BLOCKER</span>
+      </div>
+      <p>Make all page sections visible by default (opacity: 1, transform: none). Use CSS-only animation as progressive enhancement, not JS-gated visibility. Sections should render for crawlers, social preview generators, and screenshot tools without requiring JavaScript scroll events.</p>
+      <div class="fix-meta">
+        <span>Effort: Quick fix</span>
+        <span>Impact: Fixes SEO, social previews, crawler indexing</span>
+        <span>Dimensions: Trust & Polish</span>
+      </div>
+    </div>
+
+    <div class="fix-item" style="border-left:3px solid var(--amber);">
+      <div class="fix-header">
+        <span class="fix-num">3</span>
+        <span class="fix-title">Connect newsletter form to backend</span>
+        <span class="badge badge-high">HIGH</span>
+      </div>
+      <p>Connect the form to a real email service (ConvertKit, Mailchimp, Buttondown) or remove the form entirely. A fake success message is worse than no form, because it trains visitors to distrust future interactions.</p>
+      <div class="fix-meta">
+        <span>Effort: Moderate (needs API key)</span>
+        <span>Impact: Captures every newsletter lead currently being lost</span>
+        <span>Dimensions: Trust & Polish, Time to Value</span>
+      </div>
+    </div>
+
+    <div class="fix-item" style="border-left:3px solid var(--amber);">
+      <div class="fix-header">
+        <span class="fix-num">4</span>
+        <span class="fix-title">Replace emoji testimonials with real social proof</span>
+        <span class="badge badge-high">HIGH</span>
+      </div>
+      <p>Add actual client names, roles, companies, and real quotes. Even anonymized attributions ("Director of Talent, Fortune 500 energy company") are more credible than emoji icons with generic outcome descriptions.</p>
+      <div class="fix-meta">
+        <span>Effort: Moderate (needs real client data)</span>
+        <span>Impact: Trust inflection point for conversion-ready visitors</span>
+        <span>Dimensions: Trust & Polish, Emotional Arc</span>
+      </div>
+    </div>
+
+    <div class="fix-item" style="border-left:3px solid var(--amber);">
+      <div class="fix-header">
+        <span class="fix-num">5</span>
+        <span class="fix-title">Add pricing anchor</span>
+        <span class="badge badge-high">HIGH</span>
+      </div>
+      <p>Show a starting price or price range somewhere on the page. "Systems start at $X" or "One-time build from $X-$Y." This eliminates the "is this $500 or $50,000?" question that kills demo bookings before they happen.</p>
+      <div class="fix-meta">
+        <span>Effort: Quick fix</span>
+        <span>Impact: Higher-quality demos, less tire-kicker time</span>
+        <span>Dimensions: Time to Value</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer style="border-top:1px solid var(--border);padding-top:24px;text-align:center;">
+    <p class="small muted">Generated by /human-experience simulation. Method: cognitive walkthrough + heuristic evaluation + responsive audit.</p>
+    <p class="small muted" style="margin-top:4px;font-family:'JetBrains Mono',monospace;font-size:0.68rem;">talentsignals.co | 2026-03-09 | 12 screenshots analyzed | 10 findings</p>
+  </footer>
+
 </div>
 
 </body>
